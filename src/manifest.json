@@ -6,15 +6,15 @@
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
-      "16": "assets/icons/omg.default.16x16.png",
-      "48": "assets/icons/omg.default.48x48.png",
-      "128": "assets/icons/omg.default.128x128.png"
+      "16": "icons/omg.default.16x16.png",
+      "48": "icons/omg.default.48x48.png",
+      "128": "icons/omg.default.128x128.png"
     }
   },
   "icons": {
-    "16": "assets/icons/omg.default.16x16.png",
-    "48": "assets/icons/omg.default.48x48.png",
-    "128": "assets/icons/omg.default.128x128.png"
+    "16": "icons/omg.default.16x16.png",
+    "48": "icons/omg.default.48x48.png",
+    "128": "icons/omg.default.128x128.png"
   },
   "permissions": [
     "storage"

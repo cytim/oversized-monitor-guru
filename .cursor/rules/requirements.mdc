@@ -1,6 +1,0 @@
----
-description: Project requirements
-globs: ["**/*.html", "**/*.js", "**/*.css"]
-alwaysApply: true
----
-Always refer to @README.md for the project background, functional requirements and non-functional requirements.
