@@ -1,0 +1,26 @@
+{
+  "name": "Oversized Monitor Guru",
+  "description": "Stream a portion of your large monitor for screen sharing.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/omg.default.16x16.png",
+      "48": "assets/icons/omg.default.48x48.png",
+      "128": "assets/icons/omg.default.128x128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/omg.default.16x16.png",
+    "48": "assets/icons/omg.default.48x48.png",
+    "128": "assets/icons/omg.default.128x128.png"
+  },
+  "permissions": [
+    "storage",
+    "system.display"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
