@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const loadingDiv = document.getElementById('loading');
   const errorDiv = document.getElementById('error');
 
+  const fps = 30;
+  const frameInterval = 1000 / fps;
+
   let windowId = null;
   let mediaStream = null;
   let ctx = null;
@@ -13,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     offset_x: 0,
     offset_y: 0
   };
+  let lastFrameTime = 0;
 
   // Get current window ID and initialize streaming
   chrome.windows.getCurrent(function (currentWindow) {
@@ -101,9 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
       // Request screen capture with audio disabled for better performance
       mediaStream = await navigator.mediaDevices.getDisplayMedia({
         video: {
-          width: { ideal: 3840 },
-          height: { ideal: 2160 },
-          frameRate: { ideal: 60 }
+          width: { ideal: 3840, max: 3840 },
+          height: { ideal: 2160, max: 2160 },
+          frameRate: { ideal: 30, max: 30 }
         },
         audio: false
       });
@@ -152,8 +156,12 @@ document.addEventListener('DOMContentLoaded', function () {
     video.onloadedmetadata = () => {
       console.log('Video bounds:', video.videoWidth, video.videoHeight, window.devicePixelRatio);
 
-      function drawFrame() {
-        if (!video.paused && !video.ended) {
+      function drawFrame(currentTime) {
+        if (video.paused || video.ended) {
+          return;
+        }
+
+        if (currentTime - lastFrameTime >= frameInterval) {
           // Get current validated config (in case it changed during streaming)
           const currentConfig = validateStreamConfig(video.videoWidth, video.videoHeight);
           if (currentConfig.width !== canvas.width || currentConfig.height !== canvas.height) {
@@ -173,11 +181,13 @@ document.addEventListener('DOMContentLoaded', function () {
             0, 0, canvas.width, canvas.height
           );
 
-          requestAnimationFrame(drawFrame);
+          lastFrameTime = currentTime;
         }
+
+        requestAnimationFrame(drawFrame);
       }
 
-      drawFrame();
+      drawFrame(performance.now());
     };
   }
 
