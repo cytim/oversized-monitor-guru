@@ -69,7 +69,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Validate and clamp streamConfig to video bounds
   function validateStreamConfig(videoWidth, videoHeight) {
+    const dpr = window.devicePixelRatio || 1;
+
     const config = { ...streamConfig };
+    config.offset_x = Math.round(config.offset_x * dpr);
+    config.offset_y = Math.round(config.offset_y * dpr);
+    config.width = Math.round(config.width * dpr);
+    config.height = Math.round(config.height * dpr);
 
     // Ensure offsets are not negative
     config.offset_x = Math.max(0, config.offset_x);
