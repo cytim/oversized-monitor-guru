@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const loadingDiv = document.getElementById('loading');
   const errorDiv = document.getElementById('error');
 
+  let windowId = null;
   let mediaStream = null;
   let ctx = null;
   let streamConfig = {
@@ -16,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
   // Get current window ID and initialize streaming
   chrome.windows.getCurrent(function (currentWindow) {
     if (currentWindow && currentWindow.id) {
+      windowId = currentWindow.id;
+
       // Set streaming state to active
       chrome.storage.local.set({
         isStreaming: true,
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Listen for real-time configuration updates
   chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (namespace === 'local' && changes.streamConfig) {
-      updateStreamConfig({ ...streamConfig, ...changes.streamConfig.newValue });
+      onStreamConfigChange({ ...streamConfig, ...changes.streamConfig.newValue });
     }
   });
 
@@ -48,15 +51,20 @@ document.addEventListener('DOMContentLoaded', function () {
   function loadStreamConfig(done) {
     chrome.storage.local.get(['streamConfig'], function (result) {
       if (result.streamConfig) {
-        updateStreamConfig({ ...streamConfig, ...result.streamConfig });
+        onStreamConfigChange({ ...streamConfig, ...result.streamConfig });
       }
       done()
     });
   }
 
-  function updateStreamConfig(newStreamConfig) {
+  function onStreamConfigChange(newStreamConfig) {
     console.log('Updating stream config: ', newStreamConfig);
     streamConfig = newStreamConfig;
+
+    chrome.windows.update(windowId, {
+      width: newStreamConfig.width,
+      height: newStreamConfig.height
+    });
   }
 
   // Validate and clamp streamConfig to video bounds
