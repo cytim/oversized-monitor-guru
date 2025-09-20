@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let mediaStream = null;
   let ctx = null;
+  let streamConfig = {
+    width: 1920,
+    height: 1080,
+    offset_x: 0,
+    offset_y: 0
+  };
 
   // Get current window ID and initialize streaming
   chrome.windows.getCurrent(function (currentWindow) {
@@ -21,8 +27,15 @@ document.addEventListener('DOMContentLoaded', function () {
       chrome.action.setBadgeBackgroundColor({ color: "#4CAF50" });
       chrome.action.setBadgeTextColor({ color: "#FFFFFF" });
 
-      // Start screen capture
-      startScreenCapture();
+      // Load stream configuration and start screen capture
+      loadStreamConfig(startScreenCapture);
+    }
+  });
+
+  // Listen for real-time configuration updates
+  chrome.storage.onChanged.addListener(function (changes, namespace) {
+    if (namespace === 'local' && changes.streamConfig) {
+      updateStreamConfig({ ...streamConfig, ...changes.streamConfig.newValue });
     }
   });
 
@@ -30,6 +43,44 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('beforeunload', function () {
     stopStreaming();
   });
+
+  // Load stream configuration from storage
+  function loadStreamConfig(done) {
+    chrome.storage.local.get(['streamConfig'], function (result) {
+      if (result.streamConfig) {
+        updateStreamConfig({ ...streamConfig, ...result.streamConfig });
+      }
+      done()
+    });
+  }
+
+  function updateStreamConfig(newStreamConfig) {
+    console.log('Updating stream config: ', newStreamConfig);
+    streamConfig = newStreamConfig;
+  }
+
+  // Validate and clamp streamConfig to video bounds
+  function validateStreamConfig(videoWidth, videoHeight) {
+    const config = { ...streamConfig };
+
+    // Ensure offsets are not negative
+    config.offset_x = Math.max(0, config.offset_x);
+    config.offset_y = Math.max(0, config.offset_y);
+
+    // Ensure crop area doesn't exceed video bounds
+    config.offset_x = Math.min(config.offset_x, videoWidth - 1);
+    config.offset_y = Math.min(config.offset_y, videoHeight - 1);
+
+    // Ensure width and height are positive
+    config.width = Math.max(1, config.width);
+    config.height = Math.max(1, config.height);
+
+    // Clamp dimensions to fit within video bounds
+    config.width = Math.min(config.width, videoWidth - config.offset_x);
+    config.height = Math.min(config.height, videoHeight - config.offset_y);
+
+    return config;
+  }
 
   async function startScreenCapture() {
     try {
@@ -81,16 +132,33 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function startRendering() {
-    console.log('Rendering started - canvas setup will be implemented next');
+    console.log('Rendering started with cropping');
     ctx = canvas.getContext('2d');
 
     video.onloadedmetadata = () => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      console.log('Video bounds: ', video.videoWidth, video.videoHeight, window.devicePixelRatio);
 
       function drawFrame() {
         if (!video.paused && !video.ended) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          // Get current validated config (in case it changed during streaming)
+          const currentConfig = validateStreamConfig(video.videoWidth, video.videoHeight);
+          if (currentConfig.width !== canvas.width || currentConfig.height !== canvas.height) {
+            canvas.width = currentConfig.width;
+            canvas.height = currentConfig.height;
+          }
+
+          // Clear the canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw the cropped portion of the video at 1:1 scale
+          // Source: video at (offset_x, offset_y) with size (width, height)
+          // Destination: canvas at (0, 0) with same size (width, height)
+          ctx.drawImage(
+            video,
+            currentConfig.offset_x, currentConfig.offset_y, currentConfig.width, currentConfig.height,
+            0, 0, canvas.width, canvas.height
+          );
+
           requestAnimationFrame(drawFrame);
         }
       }
@@ -100,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function stopStreaming() {
+    console.log('Stopping streaming');
+
     // Stop media stream
     if (mediaStream) {
       mediaStream.getTracks().forEach(track => track.stop());
