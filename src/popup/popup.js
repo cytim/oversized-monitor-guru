@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
   form.addEventListener('input', saveFormValues);
 
   streamBtn.addEventListener('click', function () {
-    if (streamBtn.textContent === 'Start Stream') {
+    if (streamBtn.textContent === 'Start Mirroring') {
       startStreaming();
     } else {
       stopStreaming();
@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function refreshUI({ isStreaming }) {
     if (isStreaming) {
-      streamBtn.textContent = 'Stop Stream';
+      streamBtn.textContent = 'Stop Mirroring';
       streamBtn.style.backgroundColor = '#f44336';
     } else {
-      streamBtn.textContent = 'Start Stream';
+      streamBtn.textContent = 'Start Mirroring';
       streamBtn.style.backgroundColor = '#4CAF50';
     }
   }
