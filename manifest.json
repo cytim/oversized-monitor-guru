@@ -17,9 +17,7 @@
     "128": "assets/icons/omg.default.128x128.png"
   },
   "permissions": [
-    "activeTab",
-    "storage",
-    "system.display"
+    "storage"
   ],
   "background": {
     "service_worker": "background.js"

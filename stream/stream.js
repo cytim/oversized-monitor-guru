@@ -53,12 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
       if (result.streamConfig) {
         onStreamConfigChange({ ...streamConfig, ...result.streamConfig });
       }
-      done()
+      done();
     });
   }
 
   function onStreamConfigChange(newStreamConfig) {
-    console.log('Updating stream config: ', newStreamConfig);
+    console.log('Stream config changed:', newStreamConfig);
     streamConfig = newStreamConfig;
 
     chrome.windows.update(windowId, {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Start rendering the stream
       startRendering();
     } catch (error) {
-      console.error('Screen capture failed:', error);
+      console.log('Screen capture failed:', error);
       handleCaptureError(error);
     }
   }
@@ -140,11 +140,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function startRendering() {
-    console.log('Rendering started with cropping');
+    console.log('Rendering started');
     ctx = canvas.getContext('2d');
 
     video.onloadedmetadata = () => {
-      console.log('Video bounds: ', video.videoWidth, video.videoHeight, window.devicePixelRatio);
+      console.log('Video bounds:', video.videoWidth, video.videoHeight, window.devicePixelRatio);
 
       function drawFrame() {
         if (!video.paused && !video.ended) {

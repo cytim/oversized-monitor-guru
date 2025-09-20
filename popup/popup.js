@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Listen for storage changes to refresh UI when streaming state changes
   chrome.storage.onChanged.addListener(function (changes, namespace) {
-    if (namespace === 'local' && changes.isStreaming.newValue != null) {
+    if (namespace === 'local' && changes.isStreaming && changes.isStreaming.newValue != null) {
       onStateChange();
     }
   });
