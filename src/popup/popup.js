@@ -40,7 +40,9 @@ document.addEventListener('DOMContentLoaded', function () {
         url: 'stream/stream.html',
         type: 'popup',
         width: streamConfig.width,
-        height: streamConfig.height
+        height: streamConfig.height,
+        left: window.screen.width - streamConfig.width,
+        top: 0
       });
     });
   }

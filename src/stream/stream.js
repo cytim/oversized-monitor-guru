@@ -153,7 +153,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function startRendering() {
     console.log('Rendering started');
-    ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d', { alpha: false });
+    ctx.imageSmoothingEnabled = false;
 
     video.onloadedmetadata = () => {
       console.log('Video bounds:', video.videoWidth, video.videoHeight, window.devicePixelRatio);
