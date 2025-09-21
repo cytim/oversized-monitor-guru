@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   streamBtn.addEventListener('click', function () {
     if (streamBtn.textContent === 'Start Mirroring') {
-      startStreaming();
+      if (saveFormValues()) {
+        startStreaming();
+      }
     } else {
       stopStreaming();
     }
@@ -33,20 +35,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // State updates are handled in stream.html to ensure accurate state restoration if the window is opened outside of the popup controls.
   function startStreaming() {
-    const formData = getFormData();
-
-    // Validate form data
-    if (!validateFormData(formData)) {
-      alert('Please enter valid values for all fields.');
-      return;
-    }
-
-    // Open stream.html in a new popup window
-    chrome.windows.create({
-      url: 'stream/stream.html',
-      type: 'popup',
-      width: formData.width,
-      height: formData.height
+    chrome.storage.local.get(['streamConfig'], function ({ streamConfig }) {
+      chrome.windows.create({
+        url: 'stream/stream.html',
+        type: 'popup',
+        width: streamConfig.width,
+        height: streamConfig.height
+      });
     });
   }
 
@@ -109,7 +104,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function saveFormValues() {
     const formData = getFormData();
+
+    if (!validateFormData(formData)) {
+      alert('Please enter valid values for all fields.');
+      return false;
+    }
+
     chrome.storage.local.set({ streamConfig: formData });
+    return true;
   }
 
   function loadFormValues() {
@@ -121,7 +123,12 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('offset-x').value = config.offset_x || 0;
         document.getElementById('offset-y').value = config.offset_y || 0;
         document.getElementById('frame-rate').value = config.frame_rate || 30;
-        document.getElementById('dpr').value = config.dpr || 1.0;
+        document.getElementById('dpr').value = config.dpr || window.devicePixelRatio || 1.0;
+      } else {
+        // Initialize with default values
+        document.getElementById('width').value = Math.floor(window.screen.width / 2);
+        document.getElementById('height').value = window.screen.height;
+        document.getElementById('dpr').value = window.devicePixelRatio || 1.0;
       }
     });
   }

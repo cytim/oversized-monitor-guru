@@ -101,11 +101,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function startScreenCapture() {
     try {
+      const windowWidth = window.screen.width;
+      const windowHeight = window.screen.height;
+
       // Request screen capture with audio disabled for better performance
       mediaStream = await navigator.mediaDevices.getDisplayMedia({
         video: {
-          width: { ideal: 3840, max: 3840 },
-          height: { ideal: 2160, max: 2160 },
+          width: { ideal: windowWidth, max: windowWidth },
+          height: { ideal: windowHeight, max: windowHeight },
           frameRate: { ideal: streamConfig.frame_rate, max: streamConfig.frame_rate }
         },
         audio: false
