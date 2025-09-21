@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
     return {
       width: parseInt(document.getElementById('width').value),
       height: parseInt(document.getElementById('height').value),
-      offset_x: parseInt(document.getElementById('offset_x').value),
-      offset_y: parseInt(document.getElementById('offset_y').value)
+      offset_x: parseInt(document.getElementById('offset-x').value),
+      offset_y: parseInt(document.getElementById('offset-y').value)
     };
   }
 
@@ -106,8 +106,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const config = result.streamConfig;
         document.getElementById('width').value = config.width || 1920;
         document.getElementById('height').value = config.height || 1080;
-        document.getElementById('offset_x').value = config.offset_x || 0;
-        document.getElementById('offset_y').value = config.offset_y || 0;
+        document.getElementById('offset-x').value = config.offset_x || 0;
+        document.getElementById('offset-y').value = config.offset_y || 0;
       }
     });
   }
