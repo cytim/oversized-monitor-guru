@@ -54,6 +54,43 @@
       background-color: #cccccc;
       cursor: not-allowed;
     }
+
+    a {
+      color: #2196F3;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .advanced-config .advanced-config-toggle {
+      background: none;
+      border: none;
+      display: block;
+      font-size: 14px;
+      margin-bottom: 15px;
+      transition: color 0.2s ease;
+    }
+
+    .advanced-config .advanced-config-toggle .triangle {
+      display: inline-block;
+      margin-right: 5px;
+      transition: transform 0.2s ease;
+      font-size: 10px;
+    }
+
+    .advanced-config .advanced-config-body {
+      display: none;
+    }
+
+    .advanced-config.expanded .advanced-config-toggle .triangle {
+      transform: rotate(90deg);
+    }
+
+    .advanced-config.expanded .advanced-config-body {
+      display: block;
+    }
   </style>
 </head>
 
@@ -79,6 +116,22 @@
     <div class="form-group">
       <label for="offset-y">Offset from Top (px)</label>
       <input type="number" id="offset-y" name="offset-y" value="0" min="0" required>
+    </div>
+
+    <div id="advanced-config" class="advanced-config">
+      <a class="advanced-config-toggle" href="#"><span class="triangle">▶</span>Advanced Config</a>
+    
+      <div class="advanced-config-body">
+        <div class="form-group">
+          <label for="frame-rate">Frame Rate (fps)</label>
+          <input type="number" id="frame-rate" name="frame-rate" value="30" min="10" max="1000" step="10">
+        </div>
+    
+        <div class="form-group">
+          <label for="dpr">Device Pixel Ratio</label>
+          <input type="number" id="dpr" name="dpr" value="1.0" min="0.1" max="4" step="0.1">
+        </div>
+      </div>
     </div>
 
     <button type="button" id="streamBtn">Start Mirroring</button>

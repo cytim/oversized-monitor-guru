@@ -1,9 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
   const streamBtn = document.getElementById('streamBtn');
   const form = document.getElementById('streamForm');
+  const advancedConfig = document.getElementById('advanced-config');
+  const advancedConfigToggle = advancedConfig.querySelector('.advanced-config-toggle');
 
   loadFormValues();
   onStateChange();
+
+  // Handle advanced config toggle
+  advancedConfigToggle.addEventListener('click', function (e) {
+    e.preventDefault();
+    advancedConfig.classList.toggle('expanded');
+  });
 
   // Listen for storage changes to refresh UI when streaming state changes
   chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -86,13 +94,17 @@ document.addEventListener('DOMContentLoaded', function () {
       width: parseInt(document.getElementById('width').value),
       height: parseInt(document.getElementById('height').value),
       offset_x: parseInt(document.getElementById('offset-x').value),
-      offset_y: parseInt(document.getElementById('offset-y').value)
+      offset_y: parseInt(document.getElementById('offset-y').value),
+      frame_rate: parseInt(document.getElementById('frame-rate').value),
+      dpr: parseFloat(document.getElementById('dpr').value)
     };
   }
 
   function validateFormData(data) {
     return data.width > 0 && data.height > 0 &&
-      data.offset_x >= 0 && data.offset_y >= 0;
+      data.offset_x >= 0 && data.offset_y >= 0 &&
+      data.frame_rate >= 10 && data.frame_rate <= 1000 &&
+      data.dpr >= 0.1 && data.dpr <= 4;
   }
 
   function saveFormValues() {
@@ -108,6 +120,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('height').value = config.height || 1080;
         document.getElementById('offset-x').value = config.offset_x || 0;
         document.getElementById('offset-y').value = config.offset_y || 0;
+        document.getElementById('frame-rate').value = config.frame_rate || 30;
+        document.getElementById('dpr').value = config.dpr || 1.0;
       }
     });
   }

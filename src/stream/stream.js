@@ -4,9 +4,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const loadingDiv = document.getElementById('loading');
   const errorDiv = document.getElementById('error');
 
-  const fps = 30;
-  const frameInterval = 1000 / fps;
-
   let windowId = null;
   let mediaStream = null;
   let ctx = null;
@@ -14,7 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
     width: 1920,
     height: 1080,
     offset_x: 0,
-    offset_y: 0
+    offset_y: 0,
+    frame_rate: 30,
+    dpr: 1.0
   };
   let lastFrameTime = 0;
 
@@ -73,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Validate and clamp streamConfig to video bounds
   function validateStreamConfig(videoWidth, videoHeight) {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = streamConfig.dpr || window.devicePixelRatio || 1;
 
     const config = { ...streamConfig };
     config.offset_x = Math.round(config.offset_x * dpr);
@@ -107,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
         video: {
           width: { ideal: 3840, max: 3840 },
           height: { ideal: 2160, max: 2160 },
-          frameRate: { ideal: 30, max: 30 }
+          frameRate: { ideal: streamConfig.frame_rate, max: streamConfig.frame_rate }
         },
         audio: false
       });
@@ -161,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
+        const frameInterval = 1000 / streamConfig.frame_rate;
         if (currentTime - lastFrameTime >= frameInterval) {
           // Get current validated config (in case it changed during streaming)
           const currentConfig = validateStreamConfig(video.videoWidth, video.videoHeight);
