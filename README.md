@@ -6,11 +6,6 @@ Watch the demo below to see OMG in action.
 
 [![OMG Oversized Monitor Guru](https://img.youtube.com/vi/X63sz9alOC8/maxresdefault.jpg)](https://www.youtube.com/watch?v=X63sz9alOC8)
 
-## Installation for Developers
-
-1. Clone this repository to your machine.
-2. Load the `src` folder as [Unpacked Extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
-
 ## How to Use
 
 **Setting Up the Mirror:**
@@ -26,7 +21,21 @@ Watch the demo below to see OMG in action.
 1. Start screen sharing in your conferencing app
 2. Select the `OMG` mirror _window_ to share (not your main screen)
 
-## Limitation
+## Limitations
 
-- 🛠️ **Tab mirroring not supported** - OMG works with windows and full screens only
-- ‼️ **Keep mirror somehow visible** - Completely hiding the mirror window behind other apps may cause freezing in Google Meet, as the platform pauses rendering for "inactive" windows
+- 🛠️ If the mirrored content appears too large or too small, open `Advanced Config` and adjust the `Device Pixel Ratio` setting.
+- ‼️ **Keep the mirror window at least partially visible** – If the mirror window is completely hidden behind other applications, Google Meet may freeze the content, since it stops updating "inactive" windows.
+
+
+## Development
+
+### Installation
+
+1. Clone this repository to your machine.
+2. Load the `src` folder as [Unpacked Extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
+
+### Publish
+
+```sh
+make package
+```

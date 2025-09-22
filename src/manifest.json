@@ -1,6 +1,6 @@
 {
-  "name": "Oversized Monitor Guru",
-  "description": "Stream a portion of your large monitor for screen sharing.",
+  "name": "Oversized Monitor Guru (OMG)",
+  "description": "Transform your large monitor into a professional screen sharing experience!",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
