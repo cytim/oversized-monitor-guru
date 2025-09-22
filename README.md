@@ -30,7 +30,3 @@ Watch the demo below to see OMG in action.
 
 - 🛠️ **Tab mirroring not supported** - OMG works with windows and full screens only
 - ‼️ **Keep mirror somehow visible** - Completely hiding the mirror window behind other apps may cause freezing in Google Meet, as the platform pauses rendering for "inactive" windows
-
-## Credits
-
-- [Cast icon](https://www.flaticon.com/free-icon/cast_4562831) is created by [Hilmy Abiyyu A.](https://www.flaticon.com/authors/hilmy-abiyyu-a) on Flaticon.
