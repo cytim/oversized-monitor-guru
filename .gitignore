@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows
-# Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows
+# Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,react
+# Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,react
 
 ### Linux ###
 *~
@@ -49,6 +49,22 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+node_modules
+bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -75,8 +91,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/linux,macos,windows
+# End of https://www.toptal.com/developers/gitignore/api/linux,macos,windows,react
 
 ### Custom ###
 
 build
+dist

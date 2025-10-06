@@ -1,0 +1,30 @@
+{
+  "name": "oversized-monitor-guru",
+  "version": "1.0.0",
+  "description": "Mirrors a selected screen area in a separate window for better screen sharing on large monitors during virtual meetings.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "screen-sharing",
+    "monitor",
+    "react"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9"
+  }
+}
