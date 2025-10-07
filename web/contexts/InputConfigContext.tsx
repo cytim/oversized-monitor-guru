@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { InputConfig } from '../types';
 
 const DEFAULT_INPUT_CONFIG: InputConfig = {
-  syncWindowDimensions: false,
+  syncWindowDimensions: true,
   width: Math.floor(window.screen.width / 2),
   height: window.screen.height,
   offsetX: 0,
