@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { InputConfig } from '../types';
 import { useInputConfig } from '../contexts/InputConfigContext';
 import './ConfigView.css';
@@ -12,6 +12,34 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
   const [config, setConfig] = useState<InputConfig>(inputConfig);
   const [advancedExpanded, setAdvancedExpanded] = useState<boolean>(false);
   const [errors, setErrors] = useState<Partial<Record<keyof InputConfig, string>>>({});
+
+  useEffect(() => {
+    if (!config.syncWindowDimensions) return;
+
+    // Since window position changes don't trigger native events, polling is required to detect updates.
+    const intervalId = setInterval(() => {
+      const newWidth = window.outerWidth;
+      const newHeight = window.outerHeight;
+      const newX = window.screenX;
+      const newY = window.screenY;
+
+      // Only update state if values changed to avoid unnecessary re-renders
+      if (newWidth !== config.width || newHeight !== config.height ||
+        newX !== config.offsetX || newY !== config.offsetY) {
+        setConfig(prev => ({
+          ...prev,
+          width: newWidth,
+          height: newHeight,
+          offsetX: newX,
+          offsetY: newY
+        }));
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [config.syncWindowDimensions, config.width, config.height, config.offsetX, config.offsetY]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +62,7 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
     setAdvancedExpanded(!advancedExpanded);
   };
 
-  const handleInputChange = (field: keyof InputConfig, value: number) => {
+  const handleInputChange = (field: keyof InputConfig, value: number | boolean) => {
     setConfig(prev => ({
       ...prev,
       [field]: value
@@ -51,6 +79,17 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
       <h2>Oversized Monitor Guru</h2>
 
       <form id="inputForm" onSubmit={handleSubmit}>
+        <div className="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={config.syncWindowDimensions}
+              onChange={(e) => handleInputChange('syncWindowDimensions', e.target.checked)}
+            />
+            Sync with window's dimensions
+          </label>
+        </div>
+
         <div className="form-group">
           <label htmlFor="width">Width (px)</label>
           <input
@@ -60,6 +99,7 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
             onChange={(e) => handleInputChange('width', parseInt(e.target.value) || 0)}
             min="1"
             required
+            disabled={config.syncWindowDimensions}
           />
           {errors.width && <div className="field-error">{errors.width}</div>}
         </div>
@@ -73,6 +113,7 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
             onChange={(e) => handleInputChange('height', parseInt(e.target.value) || 0)}
             min="1"
             required
+            disabled={config.syncWindowDimensions}
           />
           {errors.height && <div className="field-error">{errors.height}</div>}
         </div>
@@ -86,6 +127,7 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
             onChange={(e) => handleInputChange('offsetX', parseInt(e.target.value) || 0)}
             min="0"
             required
+            disabled={config.syncWindowDimensions}
           />
           {errors.offsetX && <div className="field-error">{errors.offsetX}</div>}
         </div>
@@ -99,6 +141,7 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
             onChange={(e) => handleInputChange('offsetY', parseInt(e.target.value) || 0)}
             min="0"
             required
+            disabled={config.syncWindowDimensions}
           />
           {errors.offsetY && <div className="field-error">{errors.offsetY}</div>}
         </div>

@@ -1,4 +1,5 @@
 export interface InputConfig {
+  syncWindowDimensions: boolean;
   width: number;
   height: number;
   offsetX: number;
