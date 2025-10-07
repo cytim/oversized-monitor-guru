@@ -8,18 +8,25 @@ Watch the demo below to see OMG in action.
 
 ## How to Use
 
-**Setting Up the Mirror:**
+**Get Started**
 
-1. Click the OMG extension icon
-2. Adjust the mirror area using the size and offset controls
-3. Hit "Start Mirroring" to create your mirror window
-4. Choose to share your _entire screen_ or a specific _window_
-5. Position the mirror window at a corner
+Install the extension or visit the web version:
 
-**During Your Meeting:**
+- [Chrome Extension](https://chromewebstore.google.com/detail/oversized-monitor-guru-om/dhghddapjaemcpdfnfgpmgcjojfmhbak)
+- [Web Version](https://oversized-monitor-guru.web.app/)
 
-1. Start screen sharing in your conferencing app
-2. Select the `OMG` mirror _window_ to share (not your main screen)
+**Create Your Mirror Window**
+
+1. Launch OMG by clicking the extension icon or visiting the web version
+2. Configure the mirror area with the size and offset controls
+3. Click "Start Mirroring" to open the mirror window
+4. Grant screen capture permissions when prompted (select _entire screen_ or specific _window_)
+5. Move the mirror window to a convenient location on your screen
+
+**Share in Your Meeting**
+
+1. Open your video conferencing app and start screen sharing
+2. Choose the `OMG` mirror _window_ as your share source (not your entire display)
 
 ## Limitations
 
@@ -29,13 +36,19 @@ Watch the demo below to see OMG in action.
 
 ## Development
 
-### Installation
+### Chrome Extension
+
+#### Installation
 
 1. Clone this repository to your machine.
-2. Load the `src` folder as [Unpacked Extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
+2. Load the `chrome-extension/` folder as [Unpacked Extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
 
-### Publish
+#### Publish
 
 ```sh
 make package
 ```
+
+### Web Version
+
+Follow the instructions in `web/README.md`.
