@@ -1,8 +1,17 @@
-export interface StreamConfig {
+export interface InputConfig {
   width: number;
   height: number;
-  offset_x: number;
-  offset_y: number;
-  frame_rate: number;
+  offsetX: number;
+  offsetY: number;
+  frameRate: number;
   dpr: number;
+}
+
+export interface StreamConfig {
+  srcX: number;
+  srcY: number;
+  srcWidth: number;
+  srcHeight: number;
+  destWidth: number;
+  destHeight: number;
 }

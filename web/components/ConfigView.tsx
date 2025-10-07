@@ -1,19 +1,19 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { StreamConfig } from '../types';
-import './PopupView.css';
+import { InputConfig } from '../types';
+import './ConfigView.css';
 
-interface PopupViewProps {
-  streamConfig: StreamConfig;
-  onStartMirroring: (config: StreamConfig) => void;
+interface ConfigViewProps {
+  inputConfig: InputConfig;
+  onStartMirroring: (config: InputConfig) => void;
 }
 
-function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
-  const [config, setConfig] = useState<StreamConfig>(streamConfig);
+function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
+  const [config, setConfig] = useState<InputConfig>(inputConfig);
   const [advancedExpanded, setAdvancedExpanded] = useState<boolean>(false);
 
   useEffect(() => {
-    setConfig(streamConfig);
-  }, [streamConfig]);
+    setConfig(inputConfig);
+  }, [inputConfig]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,10 +25,10 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
     }
   };
 
-  const validateFormData = (data: StreamConfig): boolean => {
+  const validateFormData = (data: InputConfig): boolean => {
     return data.width > 0 && data.height > 0 &&
-      data.offset_x >= 0 && data.offset_y >= 0 &&
-      data.frame_rate >= 10 && data.frame_rate <= 1000 &&
+      data.offsetX >= 0 && data.offsetY >= 0 &&
+      data.frameRate >= 10 && data.frameRate <= 1000 &&
       data.dpr >= 0.1 && data.dpr <= 4;
   };
 
@@ -37,7 +37,7 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
     setAdvancedExpanded(!advancedExpanded);
   };
 
-  const handleInputChange = (field: keyof StreamConfig, value: number) => {
+  const handleInputChange = (field: keyof InputConfig, value: number) => {
     setConfig(prev => ({
       ...prev,
       [field]: value
@@ -45,10 +45,10 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
   };
 
   return (
-    <div className="popup-view">
+    <div className="config-view">
       <h2>Oversized Monitor Guru</h2>
 
-      <form id="streamForm" onSubmit={handleSubmit}>
+      <form id="inputForm" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="width">Width (px)</label>
           <input
@@ -78,8 +78,8 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
           <input
             type="number"
             id="offset-x"
-            value={config.offset_x}
-            onChange={(e) => handleInputChange('offset_x', parseInt(e.target.value) || 0)}
+            value={config.offsetX}
+            onChange={(e) => handleInputChange('offsetX', parseInt(e.target.value) || 0)}
             min="0"
             required
           />
@@ -90,8 +90,8 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
           <input
             type="number"
             id="offset-y"
-            value={config.offset_y}
-            onChange={(e) => handleInputChange('offset_y', parseInt(e.target.value) || 0)}
+            value={config.offsetY}
+            onChange={(e) => handleInputChange('offsetY', parseInt(e.target.value) || 0)}
             min="0"
             required
           />
@@ -108,8 +108,8 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
               <input
                 type="number"
                 id="frame-rate"
-                value={config.frame_rate}
-                onChange={(e) => handleInputChange('frame_rate', parseInt(e.target.value) || 0)}
+                value={config.frameRate}
+                onChange={(e) => handleInputChange('frameRate', parseInt(e.target.value) || 0)}
                 min="10"
                 max="1000"
                 step="10"
@@ -139,4 +139,4 @@ function PopupView({ streamConfig, onStartMirroring }: PopupViewProps) {
   );
 }
 
-export default PopupView;
+export default ConfigView;

@@ -1,35 +1,35 @@
 import { useEffect, useRef, useState } from 'react';
-import { StreamConfig } from '../types';
+import { InputConfig, StreamConfig } from '../types';
 import './StreamView.css';
 
 interface StreamViewProps {
-  streamConfig: StreamConfig;
+  inputConfig: InputConfig;
   onStopMirroring: () => void;
 }
 
-const validateStreamConfig = (streamConfig: StreamConfig, videoWidth: number, videoHeight: number): StreamConfig => {
-  const config = { ...streamConfig };
-  config.offset_x = Math.round(config.offset_x * config.dpr);
-  config.offset_y = Math.round(config.offset_y * config.dpr);
-  config.width = Math.round(config.width * config.dpr);
-  config.height = Math.round(config.height * config.dpr);
+const calculateStreamConfig = (inputConfig: InputConfig, videoWidth: number, videoHeight: number): StreamConfig => {
+  let srcX = Math.round(inputConfig.offsetX * inputConfig.dpr);
+  let srcY = Math.round(inputConfig.offsetY * inputConfig.dpr);
+  let srcWidth = Math.round(inputConfig.width * inputConfig.dpr);
+  let srcHeight = Math.round(inputConfig.height * inputConfig.dpr);
 
-  config.offset_x = Math.max(0, config.offset_x);
-  config.offset_y = Math.max(0, config.offset_y);
+  srcX = Math.max(0, Math.min(srcX, videoWidth - 1));
+  srcY = Math.max(0, Math.min(srcY, videoHeight - 1));
 
-  config.offset_x = Math.min(config.offset_x, videoWidth - 1);
-  config.offset_y = Math.min(config.offset_y, videoHeight - 1);
+  srcWidth = Math.max(1, Math.min(srcWidth, videoWidth - srcX));
+  srcHeight = Math.max(1, Math.min(srcHeight, videoHeight - srcY));
 
-  config.width = Math.max(1, config.width);
-  config.height = Math.max(1, config.height);
-
-  config.width = Math.min(config.width, videoWidth - config.offset_x);
-  config.height = Math.min(config.height, videoHeight - config.offset_y);
-
-  return config;
+  return {
+    srcX,
+    srcY,
+    srcWidth,
+    srcHeight,
+    destWidth: inputConfig.width,
+    destHeight: inputConfig.height
+  };
 };
 
-function StreamView({ streamConfig, onStopMirroring }: StreamViewProps) {
+function StreamView({ inputConfig, onStopMirroring }: StreamViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -54,14 +54,14 @@ function StreamView({ streamConfig, onStopMirroring }: StreamViewProps) {
 
   const startScreenCapture = async () => {
     try {
-      const screenWidth = window.screen.width * streamConfig.dpr;
-      const screenHeight = window.screen.height * streamConfig.dpr;
+      const physicalWidth = window.screen.width * inputConfig.dpr;
+      const physicalHeight = window.screen.height * inputConfig.dpr;
 
       const mediaStream = await navigator.mediaDevices.getDisplayMedia({
         video: {
-          width: { ideal: screenWidth, max: screenWidth },
-          height: { ideal: screenHeight, max: screenHeight },
-          frameRate: { ideal: streamConfig.frame_rate, max: streamConfig.frame_rate }
+          width: { ideal: physicalWidth, max: physicalWidth },
+          height: { ideal: physicalHeight, max: physicalHeight },
+          frameRate: { ideal: inputConfig.frameRate, max: inputConfig.frameRate }
         },
         audio: false
       });
@@ -107,7 +107,7 @@ function StreamView({ streamConfig, onStopMirroring }: StreamViewProps) {
   };
 
   const startRendering = () => {
-    console.log('Rendering started:', streamConfig);
+    console.log('Rendering started:', inputConfig);
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
@@ -117,7 +117,7 @@ function StreamView({ streamConfig, onStopMirroring }: StreamViewProps) {
     ctxRef.current!.imageSmoothingEnabled = false;
 
     video.onloadedmetadata = () => {
-      console.log('Video bounds:', video.videoWidth, video.videoHeight);
+      console.log('Video dimensions:', video.videoWidth, video.videoHeight);
 
       const drawFrame = (currentTime: number) => {
         if (!video || !canvas || !ctxRef.current) return;
@@ -126,20 +126,20 @@ function StreamView({ streamConfig, onStopMirroring }: StreamViewProps) {
           return;
         }
 
-        const frameInterval = 1000 / streamConfig.frame_rate;
+        const frameInterval = 1000 / inputConfig.frameRate;
         if (currentTime - lastFrameTimeRef.current >= frameInterval) {
-          const currentConfig = validateStreamConfig(streamConfig, video.videoWidth, video.videoHeight);
+          const streamConfig = calculateStreamConfig(inputConfig, video.videoWidth, video.videoHeight);
 
-          if (currentConfig.width !== canvas.width || currentConfig.height !== canvas.height) {
-            canvas.width = currentConfig.width / streamConfig.dpr;
-            canvas.height = currentConfig.height / streamConfig.dpr;
+          if (streamConfig.destWidth !== canvas.width || streamConfig.destHeight !== canvas.height) {
+            canvas.width = streamConfig.destWidth;
+            canvas.height = streamConfig.destHeight;
           }
 
           ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
 
           ctxRef.current.drawImage(
             video,
-            currentConfig.offset_x, currentConfig.offset_y, currentConfig.width, currentConfig.height,
+            streamConfig.srcX, streamConfig.srcY, streamConfig.srcWidth, streamConfig.srcHeight,
             0, 0, canvas.width, canvas.height
           );
 
