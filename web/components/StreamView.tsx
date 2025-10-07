@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { InputConfig, StreamConfig } from '../types';
+import { useInputConfig } from '../contexts/InputConfigContext';
 import './StreamView.css';
 
 interface StreamViewProps {
-  inputConfig: InputConfig;
   onStopMirroring: () => void;
 }
 
@@ -29,7 +29,9 @@ const calculateStreamConfig = (inputConfig: InputConfig, videoWidth: number, vid
   };
 };
 
-function StreamView({ inputConfig, onStopMirroring }: StreamViewProps) {
+function StreamView({ onStopMirroring }: StreamViewProps) {
+  const { inputConfig } = useInputConfig();
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);

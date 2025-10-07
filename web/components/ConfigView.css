@@ -16,6 +16,12 @@ label {
   font-weight: bold;
 }
 
+.field-error {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 input[type="number"] {
   width: 100%;
   padding: 8px;

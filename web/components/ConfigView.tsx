@@ -1,35 +1,32 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { InputConfig } from '../types';
+import { useInputConfig } from '../contexts/InputConfigContext';
 import './ConfigView.css';
 
 interface ConfigViewProps {
-  inputConfig: InputConfig;
-  onStartMirroring: (config: InputConfig) => void;
+  onStartMirroring: () => void;
 }
 
-function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
+function ConfigView({ onStartMirroring }: ConfigViewProps) {
+  const { inputConfig, updateInputConfig } = useInputConfig();
   const [config, setConfig] = useState<InputConfig>(inputConfig);
   const [advancedExpanded, setAdvancedExpanded] = useState<boolean>(false);
-
-  useEffect(() => {
-    setConfig(inputConfig);
-  }, [inputConfig]);
+  const [errors, setErrors] = useState<Partial<Record<keyof InputConfig, string>>>({});
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (validateFormData(config)) {
-      onStartMirroring(config);
+    const result = updateInputConfig(config);
+    if (result.valid) {
+      setErrors({});
+      onStartMirroring();
     } else {
-      alert('Please enter valid values for all fields.');
+      const errorDict: Partial<Record<keyof InputConfig, string>> = {};
+      result.errors.forEach(err => {
+        errorDict[err.field] = err.message;
+      });
+      setErrors(errorDict);
     }
-  };
-
-  const validateFormData = (data: InputConfig): boolean => {
-    return data.width > 0 && data.height > 0 &&
-      data.offsetX >= 0 && data.offsetY >= 0 &&
-      data.frameRate >= 10 && data.frameRate <= 1000 &&
-      data.dpr >= 0.1 && data.dpr <= 4;
   };
 
   const toggleAdvanced = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -42,6 +39,11 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
       ...prev,
       [field]: value
     }));
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
   };
 
   return (
@@ -59,6 +61,7 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
             min="1"
             required
           />
+          {errors.width && <div className="field-error">{errors.width}</div>}
         </div>
 
         <div className="form-group">
@@ -71,6 +74,7 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
             min="1"
             required
           />
+          {errors.height && <div className="field-error">{errors.height}</div>}
         </div>
 
         <div className="form-group">
@@ -83,6 +87,7 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
             min="0"
             required
           />
+          {errors.offsetX && <div className="field-error">{errors.offsetX}</div>}
         </div>
 
         <div className="form-group">
@@ -95,6 +100,7 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
             min="0"
             required
           />
+          {errors.offsetY && <div className="field-error">{errors.offsetY}</div>}
         </div>
 
         <div className={`advanced-config ${advancedExpanded ? 'expanded' : ''}`}>
@@ -114,6 +120,7 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
                 max="1000"
                 step="10"
               />
+              {errors.frameRate && <div className="field-error">{errors.frameRate}</div>}
             </div>
 
             <div className="form-group">
@@ -127,6 +134,7 @@ function ConfigView({ inputConfig, onStartMirroring }: ConfigViewProps) {
                 max="4"
                 step="0.1"
               />
+              {errors.dpr && <div className="field-error">{errors.dpr}</div>}
             </div>
           </div>
         </div>
