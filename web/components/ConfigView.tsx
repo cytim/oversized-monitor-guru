@@ -17,24 +17,41 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
     if (!config.syncWindowDimensions) return;
 
     // Since window position changes don't trigger native events, polling is required to detect updates.
-    const intervalId = setInterval(() => {
+    const intervalId = setInterval(async () => {
       const newWidth = window.outerWidth;
       const newHeight = window.outerHeight;
-      const newX = window.screenX;
-      const newY = window.screenY;
+      let newX = window.screenX;
+      let newY = window.screenY;
+      let newDpr = Math.round((window.devicePixelRatio || 1.0) * 100) / 100;
+
+      // Adjust for setups with multiple monitors.
+      if ('getScreenDetails' in window) {
+        // Window Management API is not yet standardized.
+        // https://developer.mozilla.org/en-US/docs/Web/API/Window_Management_API
+        const { currentScreen } = await (window as any).getScreenDetails();
+        newX -= currentScreen.left;
+        newY -= currentScreen.top;
+        newDpr = Math.round((currentScreen.devicePixelRatio || 1.0) * 100) / 100;
+      }
 
       // Only update state if values changed to avoid unnecessary re-renders
-      if (newWidth !== config.width || newHeight !== config.height ||
-        newX !== config.offsetX || newY !== config.offsetY) {
+      if (
+        newWidth !== config.width ||
+        newHeight !== config.height ||
+        newX !== config.offsetX ||
+        newY !== config.offsetY ||
+        newDpr !== config.dpr
+      ) {
         setConfig(prev => ({
           ...prev,
           width: newWidth,
           height: newHeight,
           offsetX: newX,
-          offsetY: newY
+          offsetY: newY,
+          dpr: newDpr
         }));
       }
-    }, 100);
+    }, 200);
 
     return () => {
       clearInterval(intervalId);
@@ -153,6 +170,21 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
 
           <div className="advanced-config-body">
             <div className="form-group">
+              <label htmlFor="dpr">Device Pixel Ratio</label>
+              <input
+                type="number"
+                id="dpr"
+                value={config.dpr}
+                onChange={(e) => handleInputChange('dpr', parseFloat(e.target.value) || 0)}
+                min="0.1"
+                max="4"
+                step="0.1"
+                disabled={config.syncWindowDimensions}
+              />
+              {errors.dpr && <div className="field-error">{errors.dpr}</div>}
+            </div>
+
+            <div className="form-group">
               <label htmlFor="frame-rate">Frame Rate (fps)</label>
               <input
                 type="number"
@@ -164,20 +196,6 @@ function ConfigView({ onStartMirroring }: ConfigViewProps) {
                 step="10"
               />
               {errors.frameRate && <div className="field-error">{errors.frameRate}</div>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="dpr">Device Pixel Ratio</label>
-              <input
-                type="number"
-                id="dpr"
-                value={config.dpr}
-                onChange={(e) => handleInputChange('dpr', parseFloat(e.target.value) || 0)}
-                min="0.1"
-                max="4"
-                step="0.1"
-              />
-              {errors.dpr && <div className="field-error">{errors.dpr}</div>}
             </div>
           </div>
         </div>

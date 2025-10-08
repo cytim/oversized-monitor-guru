@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { InputConfig, StreamConfig } from '../types';
 import { useInputConfig } from '../contexts/InputConfigContext';
 import './StreamView.css';
@@ -29,8 +29,26 @@ const calculateStreamConfig = (inputConfig: InputConfig, videoWidth: number, vid
   };
 };
 
+// Resizing the window to match the stream canvas ensures a pixel-perfect 1:1 scaling.
+// Note: This will not work if:
+// 1. The site is not running as an installed web app.
+// 2. The requested window size exceeds the available screen space.
+const fitWindowToStreamCanvas = (canvasWidth: number, canvasHeight: number) => {
+  const chromeWidth = window.outerWidth - window.innerWidth;
+  const chromeHeight = window.outerHeight - window.innerHeight;
+
+  const targetOuterWidth = canvasWidth + chromeWidth;
+  const targetOuterHeight = canvasHeight + chromeHeight;
+
+  window.resizeTo(targetOuterWidth, targetOuterHeight);
+}
+
 function StreamView({ onStopMirroring }: StreamViewProps) {
   const { inputConfig } = useInputConfig();
+  const originalWindowSize = useMemo(() => ({
+    width: window.outerWidth,
+    height: window.outerHeight
+  }), []);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -135,6 +153,7 @@ function StreamView({ onStopMirroring }: StreamViewProps) {
           if (streamConfig.destWidth !== canvas.width || streamConfig.destHeight !== canvas.height) {
             canvas.width = streamConfig.destWidth;
             canvas.height = streamConfig.destHeight;
+            fitWindowToStreamCanvas(canvas.width, canvas.height);
           }
 
           ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
@@ -172,6 +191,8 @@ function StreamView({ onStopMirroring }: StreamViewProps) {
         ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       }
     }
+
+    window.resizeTo(originalWindowSize.width, originalWindowSize.height);
   };
 
   return (
