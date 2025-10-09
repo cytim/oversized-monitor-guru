@@ -24,21 +24,22 @@ const calculateStreamConfig = (inputConfig: InputConfig, videoWidth: number, vid
     srcY,
     srcWidth,
     srcHeight,
-    destWidth: inputConfig.width,
-    destHeight: inputConfig.height
+    // Set destination dimensions equal to source for exact 1:1 pixel mapping.
+    destWidth: srcWidth,
+    destHeight: srcHeight
   };
 };
 
-// Resizing the window to match the stream canvas ensures a pixel-perfect 1:1 scaling.
+// Adjusting the window size to match the logical dimensions allows for accurate scaling based on the device pixel ratio.
 // Note: This will not work if:
 // 1. The site is not running as an installed web app.
 // 2. The requested window size exceeds the available screen space.
-const fitWindowToStreamCanvas = (canvasWidth: number, canvasHeight: number) => {
+const fitWindowToLogicalDimensions = (logicalWidth: number, logicalHeight: number) => {
   const chromeWidth = window.outerWidth - window.innerWidth;
   const chromeHeight = window.outerHeight - window.innerHeight;
 
-  const targetOuterWidth = canvasWidth + chromeWidth;
-  const targetOuterHeight = canvasHeight + chromeHeight;
+  const targetOuterWidth = logicalWidth + chromeWidth;
+  const targetOuterHeight = logicalHeight + chromeHeight;
 
   window.resizeTo(targetOuterWidth, targetOuterHeight);
 }
@@ -153,7 +154,7 @@ function StreamView({ onStopMirroring }: StreamViewProps) {
           if (streamConfig.destWidth !== canvas.width || streamConfig.destHeight !== canvas.height) {
             canvas.width = streamConfig.destWidth;
             canvas.height = streamConfig.destHeight;
-            fitWindowToStreamCanvas(canvas.width, canvas.height);
+            fitWindowToLogicalDimensions(inputConfig.width, inputConfig.height);
           }
 
           ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
