@@ -33,14 +33,10 @@ interface InputConfigProviderProps {
 }
 
 export function InputConfigProvider({ children }: InputConfigProviderProps) {
-  const [inputConfig, setInputConfig] = useState<InputConfig>(DEFAULT_INPUT_CONFIG);
-
-  useEffect(() => {
+  const [inputConfig, setInputConfig] = useState<InputConfig>(() => {
     const savedConfig = localStorage.getItem('inputConfig');
-    if (savedConfig) {
-      setInputConfig(JSON.parse(savedConfig));
-    }
-  }, []);
+    return savedConfig ? JSON.parse(savedConfig) : DEFAULT_INPUT_CONFIG;
+  });
 
   const updateInputConfig = (config: InputConfig): ValidationResult => {
     const errors: ValidationError[] = [];
